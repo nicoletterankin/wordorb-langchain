@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langchain-wordorb"
+version = "1.0.0"
+description = "LangChain tools for the WordOrb.ai vocabulary and lesson API"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Lesson of the Day PBC", email = "dev@wordorb.ai" },
+]
+keywords = [
+    "langchain",
+    "wordorb",
+    "vocabulary",
+    "education",
+    "ai-tools",
+    "nlp",
+    "dictionary",
+    "lesson",
+    "quiz",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "langchain-core>=0.2.0",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "respx>=0.21",           # httpx mocking
+    "ruff>=0.1.0",
+]
+openai = [
+    "langchain-openai>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://wordorb.ai"
+Documentation = "https://wordorb.ai/docs"
+Repository = "https://github.com/lessonoftheday/langchain-wordorb"
+"Bug Tracker" = "https://github.com/lessonoftheday/langchain-wordorb/issues"
+
+[tool.setuptools.packages.find]
+include = ["langchain_wordorb*"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
