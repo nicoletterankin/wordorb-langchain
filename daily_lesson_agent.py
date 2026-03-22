@@ -4,19 +4,17 @@ The Daily Lesson — LangChain Agent
 A LangChain agent that delivers today's lesson — the same structured 5-phase
 learning experience for everyone on Earth, every day.
 
-Not a word of the day. A LESSON of the day.
-365 lessons. 47 languages. Every device. Every age.
-
 Powered by thedailylesson.com and wordorb.ai
 """
 
 import os
 import sys
 from datetime import datetime, timezone
-from langchain.agents import AgentExecutor, create_openai_tools_agent
+
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage
+from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 
 # Import WordOrb tools (from the same package)
 try:
@@ -70,18 +68,15 @@ def get_day_of_year() -> int:
 def create_daily_lesson_agent(
     api_key: str = None,
     llm_model: str = "gpt-4o",
-    verbose: bool = False,
-    max_iterations: int = 10,
-) -> AgentExecutor:
-    """Create a Daily Lesson agent with WordOrb tools.
+):
+    """Create a modern Daily Lesson agent using LangGraph.
 
     Args:
         api_key: WordOrb API key. Defaults to WORDORB_API_KEY env var.
         llm_model: LLM model to use. Defaults to gpt-4o.
-        verbose: Whether to show agent reasoning.
 
     Returns:
-        AgentExecutor ready to deliver today's lesson.
+        A compiled LangGraph agent ready to deliver today's lesson.
     """
     api_key = api_key or os.environ.get("WORDORB_API_KEY", "")
     if not api_key:
@@ -96,25 +91,23 @@ def create_daily_lesson_agent(
     toolkit = WordOrbToolkit(api_key=api_key)
     tools = toolkit.get_tools()
 
-    # Build the prompt with today's day
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", DAILY_LESSON_SYSTEM_PROMPT.format(day_of_year=day)),
-        MessagesPlaceholder("chat_history", optional=True),
-        ("human", "{input}"),
-        MessagesPlaceholder("agent_scratchpad"),
-    ])
-
     llm = ChatOpenAI(model=llm_model, temperature=0.3)
-    agent = create_openai_tools_agent(llm, tools, prompt)
 
-    return AgentExecutor(
-        agent=agent,
-        tools=tools,
-        verbose=verbose,
-        max_iterations=max_iterations,
-        handle_parsing_errors=True,
-        return_intermediate_steps=False,
+    # Format the system prompt with today's day
+    system_message = DAILY_LESSON_SYSTEM_PROMPT.format(day_of_year=day)
+
+    # Initialize a memory saver to automatically manage chat history
+    memory = MemorySaver()
+
+    # Build the modern ReAct agent using LangGraph
+    agent = create_react_agent(
+        llm, 
+        tools, 
+        state_modifier=system_message,
+        checkpointer=memory
     )
+
+    return agent
 
 
 def main():
@@ -138,24 +131,22 @@ def main():
         sys.exit(1)
 
     try:
-        agent = create_daily_lesson_agent(verbose=False)
+        agent = create_daily_lesson_agent()
     except Exception as e:
         print(f"Error creating agent: {e}")
         sys.exit(1)
 
-    chat_history = []
+    # Required by LangGraph's checkpointer to keep track of the specific conversation
+    config = {"configurable": {"thread_id": "daily_lesson_session_1"}}
 
     # Auto-start with today's lesson
     print("Fetching today's lesson...\n")
     try:
-        result = agent.invoke({
-            "input": "Deliver today's lesson to me.",
-            "chat_history": chat_history,
-        })
-        output = result["output"]
-        print(output)
-        chat_history.append(HumanMessage(content="Deliver today's lesson to me."))
-        chat_history.append(AIMessage(content=output))
+        result = agent.invoke(
+            {"messages": [("user", "Deliver today's lesson to me.")]},
+            config=config
+        )
+        print(result["messages"][-1].content)
     except Exception as e:
         print(f"Error fetching lesson: {e}")
         print("Try again or type a question.\n")
@@ -175,14 +166,11 @@ def main():
             break
 
         try:
-            result = agent.invoke({
-                "input": user_input,
-                "chat_history": chat_history,
-            })
-            output = result["output"]
-            print(f"\nDaily Lesson: {output}")
-            chat_history.append(HumanMessage(content=user_input))
-            chat_history.append(AIMessage(content=output))
+            result = agent.invoke(
+                {"messages": [("user", user_input)]},
+                config=config
+            )
+            print(f"\nDaily Lesson: {result['messages'][-1].content}")
         except Exception as e:
             print(f"\nSorry, something went wrong: {e}")
             print("Try asking again or type 'quit' to exit.")
