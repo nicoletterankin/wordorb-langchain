@@ -74,12 +74,7 @@ python example_agent.py
 
 Sign up at [wordorb.ai/pricing](https://wordorb.ai/pricing):
 
-| Tier | Daily limit | Price |
-|------|------------|-------|
-| Free | 50 requests | $0/mo |
-| Starter | 5,000 requests | $49/mo |
-| Growth | 50,000 requests | $149/mo |
-| Enterprise | Unlimited | $499/mo |
+A key with no paid plan includes 10,000 calls per day, and no card is needed. See [wordorb.ai/pricing](https://wordorb.ai/pricing) for paid plans and current limits.
 
 ## Publishing to PyPI
 
