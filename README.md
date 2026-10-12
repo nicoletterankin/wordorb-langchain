@@ -1,6 +1,6 @@
 # langchain-wordorb
 
-LangChain tools for the [WordOrb.ai](https://wordorb.ai) vocabulary and lesson API.
+LangChain tools for the [wordorb.ai](https://wordorb.ai) vocabulary and lesson API.
 
 Provides four tools that give any LangChain agent access to 162K words,
 226K structured lessons, 21K quiz interactions, and a 30K-edge knowledge graph.
@@ -66,7 +66,7 @@ python example_agent.py
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `api_key` | required | WordOrb API key (starts with `wo_`) |
+| `api_key` | required | Word Orb API key (starts with `wo_`) |
 | `base_url` | `https://api.wordorb.ai` | API base URL |
 | `timeout` | `30.0` | HTTP timeout in seconds |
 
@@ -76,7 +76,7 @@ Sign up at [wordorb.ai/pricing](https://wordorb.ai/pricing):
 
 | Tier | Daily limit | Price |
 |------|------------|-------|
-| Free | 50 requests | $0/mo |
+| $0 | 50 requests | $0/mo |
 | Starter | 5,000 requests | $49/mo |
 | Growth | 50,000 requests | $149/mo |
 | Enterprise | Unlimited | $499/mo |
